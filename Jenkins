@@ -1,21 +1,16 @@
+```groovy
 pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "diksshta/diksshi"
+        DOCKER_IMAGE = "Diksshita/diksshi"
     }
 
     stages {
 
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/diksshta/exp1.git'
-            }
-        }
-
-        stage('Build Application') {
-            steps {
-                echo 'Building application...'
+                git 'https://github.com/diksshita/exp1.git'
             }
         }
 
@@ -29,13 +24,11 @@ pipeline {
 
         stage('Login to Docker Hub') {
             steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'dockerhub-creds',
-                        usernameVariable: 'DOCKER_USER',
-                        passwordVariable: 'DOCKER_PASS'
-                    )
-                ]) {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
                     bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
                 }
             }
@@ -54,7 +47,7 @@ pipeline {
 
     post {
         success {
-            echo 'Image successfully built, tagged and pushed to Docker Hub'
+            echo 'Image successfully built and pushed to Docker Hub'
         }
 
         failure {
@@ -62,3 +55,4 @@ pipeline {
         }
     }
 }
+```
