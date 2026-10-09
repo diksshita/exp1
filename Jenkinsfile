@@ -1,17 +1,15 @@
-<<<<<<< HEAD
 ```groovy
 pipeline {
     agent any
 
     environment {
-        DOCKER_IMAGE = "Diksshita/diksshi"
+        DOCKER_IMAGE = "diksshita/diksshi"
     }
 
     stages {
-
         stage('Clone Repository') {
             steps {
-                git 'https://github.com/diksshita/exp1.git'
+                checkout scm
             }
         }
 
@@ -23,22 +21,13 @@ pipeline {
             }
         }
 
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
-                }
-            }
-        }
-
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('', 'dockerhub-creds') {
+                    docker.withRegistry(
+                        'https://index.docker.io/v1/',
+                        'dockerhub-creds'
+                    ) {
                         docker.image("${DOCKER_IMAGE}:latest").push()
                     }
                 }
@@ -52,68 +41,8 @@ pipeline {
         }
 
         failure {
-            echo 'Pipeline failed'
+            echo 'Pipeline failed. Check the console output.'
         }
     }
 }
 ```
-=======
-```groovy
-pipeline {
-    agent any
-
-    environment {
-        DOCKER_IMAGE = "Diksshita/diksshi"
-    }
-
-    stages {
-
-        stage('Clone Repository') {
-            steps {
-                git 'https://github.com/diksshita/exp1.git'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${DOCKER_IMAGE}:latest")
-                }
-            }
-        }
-
-        stage('Login to Docker Hub') {
-            steps {
-                withCredentials([usernamePassword(
-                    credentialsId: 'dockerhub-creds',
-                    usernameVariable: 'DOCKER_USER',
-                    passwordVariable: 'DOCKER_PASS'
-                )]) {
-                    bat 'echo %DOCKER_PASS% | docker login -u %DOCKER_USER% --password-stdin'
-                }
-            }
-        }
-
-        stage('Push Docker Image') {
-            steps {
-                script {
-                    docker.withRegistry('', 'dockerhub-creds') {
-                        docker.image("${DOCKER_IMAGE}:latest").push()
-                    }
-                }
-            }
-        }
-    }
-
-    post {
-        success {
-            echo 'Image successfully built and pushed to Docker Hub'
-        }
-
-        failure {
-            echo 'Pipeline failed'
-        }
-    }
-}
-```
->>>>>>> 66b00f8ea262b5c0cf785a2339c8a5726654b84b
