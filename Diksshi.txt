@@ -1,4 +1,0 @@
-Hi Hello 
-welcome to devops
-
-this is main branch update
